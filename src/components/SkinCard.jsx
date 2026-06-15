@@ -12,26 +12,29 @@ export default function SkinCard({ skin }) {
 
   return (
     <article
-      className="relative group rounded-2xl overflow-hidden bg-cs-surface border transition-all duration-500 hover:scale-[1.08] hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]"
-      style={{ 
-        borderColor: `${cfg.color}22`,
-      }}
+      className="relative group rounded-[2rem] overflow-hidden bg-cs-surface border border-white/5 transition-all duration-700 hover:scale-[1.1] hover:shadow-[0_30px_60px_rgba(0,0,0,0.6)]"
     >
+      {/* Dynamic Background Color on Hover */}
+      <div 
+        className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-700 z-0"
+        style={{ backgroundColor: cfg.color }}
+      />
+
       {/* Rarity Top Bar */}
-      <div className="absolute top-0 left-0 right-0 h-1 z-20" style={{ backgroundColor: cfg.color }} />
+      <div className="absolute top-0 left-0 right-0 h-1.5 z-20" style={{ backgroundColor: cfg.color }} />
 
       {/* Image Area */}
-      <div className="relative flex items-center justify-center h-40 sm:h-48 p-4 overflow-hidden bg-gradient-to-b from-white/5 to-transparent">
+      <div className="relative flex items-center justify-center h-44 sm:h-52 p-6 overflow-hidden">
         {/* Ambient Glow */}
         <div 
-          className="absolute inset-0 opacity-10 blur-2xl rounded-full scale-75 group-hover:opacity-20 transition-opacity duration-500"
+          className="absolute inset-0 opacity-5 blur-3xl rounded-full scale-90 group-hover:opacity-30 transition-all duration-700"
           style={{ backgroundColor: cfg.color }}
         />
         
         <img
           src={proxiedImage}
           alt={`${arma} | ${nome}`}
-          className="relative z-10 h-full w-full object-contain drop-shadow-2xl transition-transform duration-700 group-hover:scale-125 group-hover:rotate-3"
+          className="relative z-10 h-full w-full object-contain drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all duration-700 group-hover:scale-125 group-hover:-rotate-6"
           loading="lazy"
           referrerPolicy="no-referrer"
           onError={(e) => {
@@ -41,11 +44,11 @@ export default function SkinCard({ skin }) {
         />
 
         {/* Floating Label */}
-        <div className="absolute bottom-2 left-2 z-20 flex gap-1">
+        <div className="absolute bottom-4 left-4 z-20">
           <span
-            className="text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded shadow-lg backdrop-blur-md border border-white/10"
+            className="text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full shadow-2xl backdrop-blur-xl border border-white/10"
             style={{ 
-              backgroundColor: cfg.color, 
+              backgroundColor: `${cfg.color}CC`, 
               color: cfg.color === '#FFFFFF' ? '#000' : '#fff',
             }}
           >
@@ -55,23 +58,24 @@ export default function SkinCard({ skin }) {
       </div>
 
       {/* Info Section */}
-      <div className="p-4 bg-cs-surface relative z-10">
-        <p className="text-[9px] font-bold uppercase tracking-[0.2em] mb-1 opacity-50">{arma}</p>
-        <h3 className="font-display font-bold text-cs-text leading-tight line-clamp-2 min-h-[2.5rem] text-sm sm:text-base group-hover:text-white transition-colors">
+      <div className="p-6 bg-gradient-to-t from-black/40 to-transparent relative z-10">
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-2 opacity-40">{arma}</p>
+        <h3 className="font-display font-black text-cs-text leading-tight line-clamp-2 min-h-[3rem] text-base sm:text-lg group-hover:text-white transition-colors">
           {nome}
         </h3>
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
-          <span className="font-display font-black text-cs-blue text-base">
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/5">
+          <span className="font-display font-black text-cs-blue text-xl">
             {formatPrice(preco || 150)}
           </span>
-          <div className="flex gap-1">
-             <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: cfg.color }} />
-          </div>
+          <div 
+            className="w-3 h-3 rounded-full shadow-[0_0_10px_rgba(0,0,0,0.5)] group-hover:animate-ping" 
+            style={{ backgroundColor: cfg.color }} 
+          />
         </div>
       </div>
 
       {/* Interaction Layer */}
-      <div className="absolute inset-0 bg-cs-blue/0 group-hover:bg-cs-blue/5 transition-colors duration-500 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none" />
     </article>
   )
 }

@@ -42,79 +42,66 @@ export default function App() {
 
       <div className="h-14" />
 
-      {/* Hero banner */}
-      <div className="relative py-20 px-4 overflow-hidden">
+      {/* Hero banner - Título Holográfico Monumental */}
+      <div className="relative py-28 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-cs-blue/10 via-cs-bg to-cs-bg" />
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-10 left-10 w-96 h-96 bg-cs-blue rounded-full mix-blend-screen filter blur-3xl animate-pulse" />
-          <div className="absolute bottom-10 right-10 w-96 h-96 bg-cs-gold rounded-full mix-blend-screen filter blur-3xl animate-pulse animation-delay-2000" />
+        
+        {/* Decorative elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-24 -left-24 w-[500px] h-[500px] bg-cs-blue/20 rounded-full blur-[120px] animate-pulse" />
+          <div className="absolute top-1/2 -right-24 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[100px] animate-pulse animation-delay-2000" />
         </div>
 
         <div className="relative max-w-7xl mx-auto text-center">
-          <div className="inline-block mb-6">
-            <span className="px-4 py-2 rounded-full bg-cs-blue/20 border border-cs-blue/50 text-cs-blue text-xs font-bold uppercase tracking-widest">
-              ✨ Mercado Premium de Skins
+          <div className="inline-block mb-8">
+            <span className="px-6 py-2 rounded-full bg-white/5 border border-white/10 text-white text-xs font-black uppercase tracking-[0.4em] backdrop-blur-md">
+              ✨ Premium CS2 Skins Marketplace
             </span>
           </div>
 
-          <h1 className="font-display font-black text-7xl sm:text-8xl lg:text-9xl text-cs-text uppercase leading-none tracking-tighter mb-8">
-            CS<span className="text-cs-blue">:</span>GO
-            <br />
-            <span className="bg-gradient-to-r from-cs-blue via-cs-gold to-cs-blue bg-clip-text text-transparent">
-              SKINS
-            </span>
+          <h1 className="font-display font-black text-8xl sm:text-9xl lg:text-[12rem] leading-[0.85] tracking-tighter mb-12 select-none">
+            <span className="block text-white opacity-90">CS:GO</span>
+            <span className="text-holographic">SKINS</span>
           </h1>
 
-          <div className="max-w-2xl mx-auto relative group">
-            <div className="absolute inset-0 bg-cs-blue/20 blur-xl group-hover:bg-cs-blue/30 transition-all duration-500 rounded-2xl" />
-            <div className="relative flex items-center bg-cs-surface border border-cs-border rounded-2xl p-2 focus-within:border-cs-blue transition-all duration-300 shadow-2xl">
-              <div className="pl-4 pr-2 text-cs-muted">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="max-w-3xl mx-auto relative group">
+            <div className="absolute inset-0 bg-cs-blue/30 blur-2xl group-focus-within:bg-cs-blue/50 transition-all duration-700 rounded-3xl" />
+            <div className="relative flex items-center bg-cs-surface/80 backdrop-blur-2xl border border-white/10 rounded-3xl p-3 focus-within:border-cs-blue/50 transition-all duration-500 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+              <div className="pl-5 pr-3 text-cs-blue">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
               <input 
                 type="text" 
-                placeholder="Pesquisar por nome ou arma (ex: AWP, Dragon Lore...)"
-                className="w-full bg-transparent border-none focus:ring-0 text-lg py-3 px-2 placeholder:text-cs-muted/50"
+                placeholder="Busque por skins lendárias..."
+                className="w-full bg-transparent border-none focus:ring-0 text-xl py-4 px-2 placeholder:text-cs-muted/40 font-medium"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              {searchTerm && (
-                <button 
-                  onClick={() => setSearchTerm('')}
-                  className="p-2 mr-2 hover:bg-cs-bg rounded-lg text-cs-muted hover:text-cs-text"
-                >
-                  ✕
-                </button>
-              )}
             </div>
           </div>
 
-          <p className="mt-8 text-cs-muted font-body text-sm sm:text-base">
-            {searchTerm ? `Encontradas ${filteredSkins.length} skins para sua busca` : `${skins.length} skins disponíveis no catálogo`}
+          <p className="mt-10 text-cs-muted font-body font-medium tracking-wide uppercase text-xs sm:text-sm opacity-60">
+            {searchTerm ? `Encontradas ${filteredSkins.length} skins` : `Explorando ${skins.length} itens de elite`}
           </p>
         </div>
       </div>
 
-      <main className="pb-20">
+      <main className="pb-32">
         {loading ? (
           <div className="max-w-7xl mx-auto px-4 py-20 text-center">
-            <div className="inline-block">
-              <div className="w-12 h-12 border-4 border-cs-blue/30 border-t-cs-blue rounded-full animate-spin" />
-              <p className="mt-4 text-cs-muted font-body text-sm">Sincronizando inventário…</p>
-            </div>
+             <div className="w-16 h-16 border-4 border-cs-blue/20 border-t-cs-blue rounded-full animate-spin mx-auto" />
           </div>
         ) : (
           <SkinsGrid 
             skins={filteredSkins} 
-            title={searchTerm ? 'Resultado da Busca' : 'Todas as Skins'} 
+            title={searchTerm ? 'Busca' : 'Catálogo'} 
             onSelectSkin={setSelectedSkin}
           />
         )}
       </main>
 
-      {/* Modal de Detalhes */}
       {selectedSkin && (
         <SkinModal 
           skin={selectedSkin} 
@@ -122,10 +109,14 @@ export default function App() {
         />
       )}
 
-      <footer className="border-t border-cs-border py-12 text-center text-cs-muted text-xs font-body">
+      <footer className="border-t border-white/5 py-16 text-center text-cs-muted text-[10px] font-bold uppercase tracking-[0.3em]">
         <div className="max-w-7xl mx-auto px-4">
-          <p className="mb-2 text-sm font-bold text-cs-text uppercase tracking-widest">CS:GO Skins Marketplace</p>
-          <p className="text-cs-muted/60">Imagens via Steam Community | API by ByMykel</p>
+          <p className="mb-4 text-white opacity-40">CS:GO Skins IA © 2026</p>
+          <div className="flex justify-center gap-8 opacity-30">
+            <span>Steam API</span>
+            <span>Vercel Hosting</span>
+            <span>Manus Dev</span>
+          </div>
         </div>
       </footer>
     </div>

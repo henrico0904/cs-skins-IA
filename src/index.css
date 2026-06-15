@@ -28,51 +28,42 @@
 }
 
 @layer utilities {
-  /* Pause carousel on hover */
-  .pause { animation-play-state: paused !important; }
-
-  /* Glow effect */
-  .glow-blue {
-    box-shadow: 0 0 20px rgba(0, 102, 255, 0.5);
-  }
-
-  /* Animation delay utilities */
   .animation-delay-2000 {
     animation-delay: 2s;
   }
 
-  /* Line clamp */
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+
+  /* Efeito Holográfico */
+  .text-holographic {
+    background: linear-gradient(
+      -45deg, 
+      #0066ff, #00d4ff, #A335EE, #FFD700, #00d4ff, #0066ff
+    );
+    background-size: 400% 400%;
+    animation: holo-shift 8s ease infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 15px rgba(0, 102, 255, 0.3));
+  }
 }
 
-/* Keyframes */
-@keyframes slideLeft {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+@keyframes holo-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes glow {
-  0%, 100% { box-shadow: 0 0 5px rgba(0, 102, 255, 0.3); }
-  50% { box-shadow: 0 0 20px rgba(0, 102, 255, 0.6); }
-}
-
-/* Smooth transitions */
-* {
-  @apply transition-colors duration-200;
-}
-
-/* Selection color */
-::selection {
-  background-color: rgba(0, 102, 255, 0.3);
-  color: #e4e4f0;
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
 }
