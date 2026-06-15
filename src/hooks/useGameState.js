@@ -9,6 +9,10 @@ export function useGameState() {
     if (savedFavorites) setFavorites(JSON.parse(savedFavorites))
   }, [])
 
+  const saveToStorage = (items) => {
+    localStorage.setItem('cs_favorites', JSON.stringify(items))
+  }
+
   const toggleFavorite = (skin) => {
     const isFav = favorites.find(f => f.id === skin.id)
     let newFavs
@@ -19,25 +23,30 @@ export function useGameState() {
         alert(`Inventário cheio! Limite de ${INVENTORY_LIMIT} itens atingido.`)
         return false
       }
-      newFavs = [...favorites, skin]
+      // Garantir que a skin tenha um ID único para evitar problemas no inventário
+      const skinWithUniqueId = { ...skin, id: `${skin.id}-${Date.now()}` }
+      newFavs = [...favorites, skinWithUniqueId]
     }
     setFavorites(newFavs)
-    localStorage.setItem('cs_favorites', JSON.stringify(newFavs))
+    saveToStorage(newFavs)
     return true
   }
 
   const removeSkin = (skinId) => {
     const newFavs = favorites.filter(f => f.id !== skinId)
     setFavorites(newFavs)
-    localStorage.setItem('cs_favorites', JSON.stringify(newFavs))
+    saveToStorage(newFavs)
   }
 
-  const addSkins = (newSkins) => {
-    const availableSpace = INVENTORY_LIMIT - favorites.length
-    const skinsToAdd = newSkins.slice(0, availableSpace)
-    const updatedFavs = [...favorites, ...skinsToAdd]
-    setFavorites(updatedFavs)
-    localStorage.setItem('cs_favorites', JSON.stringify(updatedFavs))
+  // NOVA FUNÇÃO: Remove várias skins e adiciona a nova de forma ATÔMICA
+  const processTrade = (idsToRemove, wonSkin) => {
+    setFavorites(prev => {
+      const filtered = prev.filter(s => !idsToRemove.includes(s.id))
+      const skinWithUniqueId = { ...wonSkin, id: `${wonSkin.id}-${Date.now()}` }
+      const updated = [...filtered, skinWithUniqueId]
+      saveToStorage(updated)
+      return updated
+    })
   }
 
   return {
@@ -45,6 +54,6 @@ export function useGameState() {
     inventoryLimit: INVENTORY_LIMIT,
     toggleFavorite,
     removeSkin,
-    addSkins
+    processTrade // Exportando a nova função atômica
   }
 }

@@ -19,7 +19,7 @@ export default function App() {
   const [showCaseOpening, setShowCaseOpening] = useState(false)
   const [showTradeCentral, setShowTradeCentral] = useState(false)
 
-  const { favorites, inventoryLimit, toggleFavorite, removeSkin, addSkins } = useGameState()
+  const { favorites, inventoryLimit, toggleFavorite, removeSkin, processTrade } = useGameState()
 
   useEffect(() => {
     try {
@@ -46,11 +46,6 @@ export default function App() {
     )
   }, [skins, searchTerm])
 
-  const handleTradeComplete = (removedIds, wonSkin) => {
-    removedIds.forEach(id => removeSkin(id))
-    addSkins([wonSkin])
-  }
-
   return (
     <div className="min-h-screen bg-cs-bg text-cs-text font-body pb-32">
       <Header />
@@ -59,27 +54,41 @@ export default function App() {
       {/* Hero banner */}
       <div className="relative py-28 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-cs-blue/10 via-cs-bg to-cs-bg" />
-        <div className="relative max-w-7xl mx-auto text-center">
-          <h1 className="font-display font-black text-8xl sm:text-9xl lg:text-[12rem] leading-[0.85] tracking-tighter mb-12 select-none">
-            <span className="block text-white opacity-90">CS:GO</span>
-            <span className="text-holographic">SKINS</span>
-          </h1>
+        
+        <div className="relative max-w-[95vw] mx-auto text-center flex flex-col items-center">
+          <div className="inline-block mb-12">
+            <span className="px-8 py-2 border border-white/10 text-white text-[10px] font-black uppercase tracking-[0.5em] backdrop-blur-md bg-white/5">
+              Premium CS2 Asset Database
+            </span>
+          </div>
 
-          <div className="max-w-3xl mx-auto relative group">
-            <div className="absolute inset-0 bg-cs-blue/30 blur-2xl group-focus-within:bg-cs-blue/50 transition-all duration-700 rounded-3xl" />
-            <div className="relative flex items-center bg-cs-surface/80 backdrop-blur-2xl border border-white/10 rounded-3xl p-3 focus-within:border-cs-blue/50 transition-all duration-500 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
-              <div className="pl-5 pr-3 text-cs-blue">
-                <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          {/* Título ocupando 75% da largura da div pai */}
+          <div className="w-full flex justify-center mb-16">
+            <h1 className="w-3/4 font-display font-black text-[12vw] leading-[0.8] tracking-tighter select-none">
+              <span className="block text-white/90">CS:GO</span>
+              <span className="text-holographic block">SKINS</span>
+            </h1>
+          </div>
+
+          <div className="w-full max-w-3xl relative group">
+            <div className="absolute inset-0 bg-cs-blue/20 blur-3xl group-focus-within:bg-cs-blue/40 transition-all duration-700" />
+            <div className="relative flex items-center bg-cs-surface border border-white/10 p-2 focus-within:border-cs-blue/50 transition-all duration-500 shadow-2xl">
+              <div className="pl-6 pr-4 text-cs-blue">
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
               </div>
               <input 
                 type="text" 
-                placeholder="Busque por skins lendárias..."
-                className="w-full bg-transparent border-none focus:ring-0 text-xl py-4 px-2 placeholder:text-cs-muted/40 font-medium"
+                placeholder="LOCALIZAR SKIN NO BANCO DE DADOS..."
+                className="w-full bg-transparent border-none focus:ring-0 text-lg py-5 px-2 placeholder:text-cs-muted/30 font-black uppercase tracking-widest"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
+          
+          <p className="mt-12 text-cs-muted font-black uppercase tracking-[0.3em] text-[10px] opacity-40">
+            {searchTerm ? `RESULTADOS: ${filteredSkins.length}` : `DATABASE: ${skins.length} ASSETS`}
+          </p>
         </div>
       </div>
 
@@ -97,7 +106,7 @@ export default function App() {
         ) : (
           <SkinsGrid 
             skins={filteredSkins} 
-            title={searchTerm ? 'Busca' : 'Catálogo'} 
+            title={searchTerm ? 'Resultados' : 'Database'} 
             onSelectSkin={setSelectedSkin}
           />
         )}
@@ -120,7 +129,7 @@ export default function App() {
           inventory={favorites}
           skins={skins}
           onClose={() => setShowTradeCentral(false)}
-          onTradeComplete={handleTradeComplete}
+          onTradeComplete={processTrade}
         />
       )}
 
@@ -132,12 +141,6 @@ export default function App() {
         onOpenCaseOpening={() => setShowCaseOpening(true)}
         onOpenTradeCentral={() => setShowTradeCentral(true)}
       />
-
-      <footer className="border-t border-white/5 py-16 text-center text-cs-muted text-[10px] font-bold uppercase tracking-[0.3em]">
-        <div className="max-w-7xl mx-auto px-4">
-          <p className="mb-2 text-sm font-bold text-cs-text uppercase tracking-widest">CS:GO Skins IA © 2026</p>
-        </div>
-      </footer>
     </div>
   )
 }
