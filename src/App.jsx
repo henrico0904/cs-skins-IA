@@ -108,6 +108,8 @@ export default function App() {
             skins={filteredSkins} 
             title={searchTerm ? 'Resultados' : 'Database'} 
             onSelectSkin={setSelectedSkin}
+            onToggleFavorite={toggleFavorite}
+            favorites={favorites}
           />
         )}
       </main>
