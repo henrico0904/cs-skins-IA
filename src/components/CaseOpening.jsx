@@ -23,6 +23,7 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
     const rand = Math.random()
     let cumulative = 0
     let targetRarity = 'Consumível'
+    
     for (const odd of ODDS) {
       cumulative += odd.chance
       if (rand <= cumulative) {
@@ -30,8 +31,18 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
         break
       }
     }
+
+    // Tenta filtrar por raridade
     const pool = skins.filter(s => s.raridade === targetRarity)
-    return pool[Math.floor(Math.random() * pool.length)] || skins[0]
+    
+    // FALLBACK DE SEGURANÇA: Se o pool estiver vazio (erro de raridade), 
+    // sorteia qualquer skin da lista COMPLETA, evitando o primeiro item.
+    if (pool.length === 0) {
+      return skins[Math.floor(Math.random() * skins.length)]
+    }
+    
+    // SORTEIO REAL: Pega um item aleatório do pool filtrado
+    return pool[Math.floor(Math.random() * pool.length)]
   }
 
   const openCase = () => {
@@ -46,8 +57,11 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
       trackRef.current.style.transform = 'translateY(0px)'
     }
 
+    // Gera 50 skins aleatórias para a roleta
     const newList = []
-    for (let i = 0; i < 50; i++) newList.push(getRandomSkin())
+    for (let i = 0; i < 50; i++) {
+      newList.push(getRandomSkin())
+    }
     
     setRouletteSkins(newList)
     setWonSkin(null)
@@ -56,7 +70,7 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
     
     setTimeout(() => {
       setSpinning(true)
-      const winner = newList[45]
+      const winner = newList[45] // O vencedor é o item 45
       
       if (trackRef.current) {
         trackRef.current.style.transition = 'transform 5s cubic-bezier(0.15, 0, 0.05, 1)'
@@ -67,7 +81,7 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
       setTimeout(() => {
         setWonSkin(winner)
         setSpinning(false)
-        setShowWinPopup(true) // Mostra o pop-up de vitória
+        setShowWinPopup(true)
       }, 5100)
     }, 50)
   }
@@ -77,7 +91,7 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
       const success = onAddFavorite(wonSkin)
       if (success) {
         setAddedToInv(true)
-        setTimeout(() => setShowWinPopup(false), 1000) // Fecha após 1s de sucesso
+        setTimeout(() => setShowWinPopup(false), 1000)
       }
     }
   }
@@ -87,7 +101,6 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
       <div className="fixed inset-0 bg-black/95 backdrop-blur-md" onClick={onClose} />
 
       <div className="relative bg-cs-surface border border-white/10 w-full max-w-6xl shadow-[0_0_100px_rgba(0,0,0,0.8)] animate-fade-in overflow-hidden">
-        {/* Header */}
         <div className="bg-white/5 border-b border-white/10 p-6 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <div className="w-1 h-6 bg-cs-blue" />
@@ -104,7 +117,6 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
 
         <div className="p-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Sidebar */}
             <div className="lg:col-span-3 space-y-4">
               <div className="bg-black/40 border border-white/5 p-6">
                 <h3 className="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-6 pb-4 border-b border-white/5">Probabilidades</h3>
@@ -125,7 +137,7 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
                 disabled={spinning || inventoryCount >= inventoryLimit}
                 className={`w-full py-6 font-black text-sm tracking-[0.4em] transition-all ${
                   !spinning && inventoryCount < inventoryLimit
-                    ? 'bg-white text-black hover:bg-cs-blue hover:text-white'
+                    ? 'bg-white text-black hover:bg-cs-blue hover:text-white shadow-[0_0_20px_rgba(255,255,255,0.1)]'
                     : 'bg-white/5 text-cs-muted cursor-not-allowed'
                 }`}
               >
@@ -133,7 +145,6 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
               </button>
             </div>
 
-            {/* Roulette View */}
             <div className="lg:col-span-9">
               <div className="roulette-container relative border border-white/10 bg-black/60">
                 <div className="roulette-pointer" />
@@ -155,7 +166,7 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
                   </div>
                 ) : (
                   <div className="h-full flex flex-col items-center justify-center opacity-10">
-                    <p className="font-black uppercase tracking-[1em] text-xs">Inicie o Sorteio</p>
+                    <p className="font-black uppercase tracking-[1em] text-xs">Aguardando Comando</p>
                   </div>
                 )}
               </div>
@@ -163,50 +174,24 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
           </div>
         </div>
 
-        {/* WIN POPUP MODAL */}
         {showWinPopup && wonSkin && (
           <div className="absolute inset-0 z-50 flex items-center justify-center p-8 animate-fade-in">
             <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
             <div className="relative bg-cs-surface border border-white/10 p-12 max-w-2xl w-full shadow-[0_0_100px_rgba(0,0,0,1)] text-center transform scale-110">
               <div className="absolute top-0 left-0 right-0 h-2" style={{ backgroundColor: getRaridade(wonSkin.raridade).color }} />
-              
               <div className="mb-8 relative">
                 <div className="absolute inset-0 blur-[100px] opacity-20" style={{ backgroundColor: getRaridade(wonSkin.raridade).color }} />
-                <img 
-                  src={`https://wsrv.nl/?url=${encodeURIComponent(wonSkin.imagem_url)}&w=500&output=webp`} 
-                  className="relative z-10 w-full h-64 object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)] animate-pulse" 
-                  alt="" 
-                />
+                <img src={`https://wsrv.nl/?url=${encodeURIComponent(wonSkin.imagem_url)}&w=500&output=webp`} className="relative z-10 w-full h-64 object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)]" alt="" />
               </div>
-
               <p className="text-cs-blue font-black uppercase tracking-[0.5em] text-xs mb-2">{wonSkin.arma}</p>
               <h3 className="text-4xl font-black text-white uppercase mb-4 tracking-tighter leading-none">{wonSkin.nome}</h3>
-              
               <div className="inline-flex items-center gap-3 px-4 py-2 border border-white/10 mb-10">
                 <div className="w-2 h-2" style={{ backgroundColor: getRaridade(wonSkin.raridade).color }} />
-                <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: getRaridade(wonSkin.raridade).color }}>
-                  Raridade: {getRaridade(wonSkin.raridade).label}
-                </span>
+                <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: getRaridade(wonSkin.raridade).color }}>Raridade: {getRaridade(wonSkin.raridade).label}</span>
               </div>
-
               <div className="flex gap-4">
-                <button 
-                  onClick={handleAddToInventory}
-                  disabled={addedToInv}
-                  className={`flex-1 py-5 font-black text-xs uppercase tracking-[0.3em] transition-all ${
-                    addedToInv 
-                    ? 'bg-green-600 text-white' 
-                    : 'bg-white text-black hover:bg-cs-blue hover:text-white'
-                  }`}
-                >
-                  {addedToInv ? '✓ ADICIONADO' : 'ADICIONAR AO INVENTÁRIO'}
-                </button>
-                <button 
-                  onClick={() => setShowWinPopup(false)}
-                  className="px-8 py-5 bg-white/5 border border-white/10 text-white font-black text-xs uppercase tracking-[0.3em] hover:bg-white/10"
-                >
-                  DESCARTAR
-                </button>
+                <button onClick={handleAddToInventory} disabled={addedToInv} className={`flex-1 py-5 font-black text-xs uppercase tracking-[0.3em] transition-all ${addedToInv ? 'bg-green-600 text-white' : 'bg-white text-black hover:bg-cs-blue hover:text-white'}`}>{addedToInv ? '✓ ADICIONADO' : 'ADICIONAR AO INVENTÁRIO'}</button>
+                <button onClick={() => setShowWinPopup(false)} className="px-8 py-5 bg-white/5 border border-white/10 text-white font-black text-xs uppercase tracking-[0.3em] hover:bg-white/10">DESCARTAR</button>
               </div>
             </div>
           </div>
