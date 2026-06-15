@@ -13,15 +13,13 @@ export default function SkinCard({ skin }) {
   return (
     <article
       className="relative group bg-cs-surface border border-white/5 transition-all duration-300 hover:shadow-[0_0_30px_rgba(0,0,0,0.5)]"
+      style={{ borderTop: `4px solid ${cfg.color}` }}
     >
-      {/* Rarity BG on Hover */}
+      {/* Rarity Background Color (Solid but subtle) */}
       <div 
-        className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500 z-0"
+        className="absolute inset-0 opacity-[0.03] z-0"
         style={{ backgroundColor: cfg.color }}
       />
-
-      {/* Rarity Bar */}
-      <div className="absolute top-0 left-0 right-0 h-1 z-20" style={{ backgroundColor: cfg.color }} />
 
       {/* Image Area */}
       <div className="relative flex items-center justify-center h-44 sm:h-52 p-6 overflow-hidden">

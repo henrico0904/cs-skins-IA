@@ -5,9 +5,9 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
   const [spinning, setSpinning] = useState(false)
   const [wonSkin, setWonSkin] = useState(null)
   const [rouletteSkins, setRouletteSkins] = useState([])
+  const [addedToInv, setAddedToInv] = useState(false)
   const trackRef = useRef(null)
 
-  // Probabilidades reais baseadas no CS:GO
   const ODDS = [
     { label: 'Consumível',  chance: 0.40, color: '#b0c3d9' },
     { label: 'Industrial',  chance: 0.25, color: '#5e98d9' },
@@ -22,7 +22,6 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
     const rand = Math.random()
     let cumulative = 0
     let targetLabel = 'Consumível'
-
     for (const odd of ODDS) {
       cumulative += odd.chance
       if (rand <= cumulative) {
@@ -30,44 +29,56 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
         break
       }
     }
-
     const pool = skins.filter(s => {
       const cfg = getRaridade(s.raridade)
-      // Ajuste para bater o label da config com o da skin
       return cfg.label === targetLabel || (targetLabel === 'Rara' && (cfg.label === 'Contrabandeada' || cfg.label === 'Rara'))
     })
-
-    if (pool.length === 0) return skins[Math.floor(Math.random() * skins.length)]
-    return pool[Math.floor(Math.random() * pool.length)]
+    return pool[Math.floor(Math.random() * pool.length)] || skins[0]
   }
 
   const openCase = () => {
     if (inventoryCount >= inventoryLimit) {
-      alert("Seu inventário está cheio! Use a Central de Trocas ou remova itens.")
+      alert("Seu inventário está cheio!")
       return
     }
     if (spinning) return
+
+    // RESET: Volta a roleta para o topo instantaneamente antes de começar
+    if (trackRef.current) {
+      trackRef.current.style.transition = 'none'
+      trackRef.current.style.transform = 'translateY(0px)'
+    }
 
     const newList = []
     for (let i = 0; i < 50; i++) newList.push(getRandomSkin())
     
     setRouletteSkins(newList)
     setWonSkin(null)
-    setSpinning(true)
-
-    const winner = newList[45]
+    setAddedToInv(false)
     
+    // Pequeno delay para o browser processar o reset da posição
     setTimeout(() => {
+      setSpinning(true)
+      const winner = newList[45]
+      
       if (trackRef.current) {
+        trackRef.current.style.transition = 'transform 5s cubic-bezier(0.15, 0, 0.05, 1)'
         const offset = -(45 * 100 + 50 - 200)
         trackRef.current.style.transform = `translateY(${offset}px)`
       }
-    }, 50)
 
-    setTimeout(() => {
-      setWonSkin(winner)
-      setSpinning(false)
-    }, 5200)
+      setTimeout(() => {
+        setWonSkin(winner)
+        setSpinning(false)
+      }, 5100)
+    }, 50)
+  }
+
+  const handleAddToInventory = () => {
+    if (wonSkin && !addedToInv) {
+      const success = onAddFavorite(wonSkin)
+      if (success) setAddedToInv(true)
+    }
   }
 
   return (
@@ -91,7 +102,6 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
 
         <div className="p-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Probabilities Panel */}
             <div className="lg:col-span-3 space-y-4">
               <div className="bg-black/40 border border-white/5 p-6">
                 <h3 className="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-6 pb-4 border-b border-white/5">Probabilidades</h3>
@@ -120,12 +130,11 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
               </button>
             </div>
 
-            {/* Roulette Track */}
             <div className="lg:col-span-9">
               <div className="roulette-container relative border border-white/10 bg-black/60">
                 <div className="roulette-pointer" />
                 {rouletteSkins.length > 0 ? (
-                  <div ref={trackRef} className="roulette-track" style={{ transform: 'translateY(0px)' }}>
+                  <div ref={trackRef} className="roulette-track">
                     {rouletteSkins.map((skin, i) => {
                       const cfg = getRaridade(skin.raridade)
                       return (
@@ -151,14 +160,25 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
               </div>
 
               {wonSkin && !spinning && (
-                <div className="mt-6 p-6 bg-white/5 border border-white/10 flex items-center gap-8 animate-fade-in">
-                  <div className="w-24 h-24 flex-shrink-0 bg-black/40 p-4 border border-white/5">
+                <div className="mt-6 p-6 bg-white/5 border border-white/10 flex items-center gap-8 animate-fade-in relative overflow-hidden">
+                  {addedToInv && <div className="absolute inset-0 bg-green-500/10 animate-pulse pointer-events-none" />}
+                  <div className="w-24 h-24 flex-shrink-0 bg-black/40 p-4 border border-white/5 relative z-10">
                     <img src={`https://wsrv.nl/?url=${encodeURIComponent(wonSkin.imagem_url)}&w=200&output=webp`} className="w-full h-full object-contain" alt="" />
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 relative z-10">
                     <p className="text-cs-blue text-[9px] font-black uppercase tracking-[0.3em] mb-1">{wonSkin.arma}</p>
                     <h3 className="text-xl font-black text-white uppercase mb-4">{wonSkin.nome}</h3>
-                    <button onClick={() => onAddFavorite(wonSkin)} className="px-6 py-3 bg-white text-black font-black text-[10px] uppercase tracking-widest hover:bg-cs-blue hover:text-white transition-all">Adicionar ao Inventário</button>
+                    <button 
+                      onClick={handleAddToInventory} 
+                      disabled={addedToInv}
+                      className={`px-6 py-3 font-black text-[10px] uppercase tracking-widest transition-all ${
+                        addedToInv 
+                        ? 'bg-green-600 text-white cursor-default' 
+                        : 'bg-white text-black hover:bg-cs-blue hover:text-white'
+                      }`}
+                    >
+                      {addedToInv ? '✓ ADICIONADO AO INVENTÁRIO' : 'ADICIONAR AO INVENTÁRIO'}
+                    </button>
                   </div>
                 </div>
               )}
