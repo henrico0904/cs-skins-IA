@@ -1,57 +1,45 @@
 import SkinCard from './SkinCard'
 
-export default function SkinsGrid({ skins, onDelete, onToggleFavorite, favorites, title }) {
-  if (!skins.length) {
+export default function SkinsGrid({ skins = [], title = 'Skins' }) {
+  // Verificação de segurança para evitar erros de undefined
+  const safeSkins = Array.isArray(skins) ? skins : []
+
+  if (safeSkins.length === 0) {
     return (
-      <div className="text-center py-32 text-cs-muted font-body">
-        <p className="text-6xl mb-4">⭐</p>
-        <p className="text-2xl font-display font-bold mb-2">Sua coleção está vazia</p>
-        <p className="text-sm">Clique na estrela das skins para adicioná-las aqui.</p>
+      <div className="text-center py-20 text-cs-muted font-body">
+        <p className="text-6xl mb-4 opacity-20">🔍</p>
+        <p className="text-xl font-display font-bold mb-1">Nenhuma skin encontrada</p>
+        <p className="text-sm opacity-60">Tente ajustar sua pesquisa ou explore outras categorias.</p>
       </div>
     )
   }
 
   return (
-    <section id="grid" className="mb-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Seção header com título e contador */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-12">
-          <div className="flex items-center gap-3">
-            <div className="w-1.5 h-8 rounded-full bg-gradient-to-b from-cs-blue to-cs-gold" />
-            <div>
-              <h2 className="font-display font-black text-3xl sm:text-4xl text-cs-text uppercase tracking-tighter">
-                {title}
-              </h2>
-              <p className="text-cs-muted text-sm font-body mt-1">
-                {title === 'Todas as Skins' ? 'Coleção completa de Counter-Strike 2' : 'Sua seleção personalizada de itens'}
-              </p>
-            </div>
-          </div>
-          <div className="ml-auto">
-            <div className="px-4 py-2 rounded-lg bg-cs-blue/20 border border-cs-blue/50">
-              <span className="text-cs-gold font-display font-bold text-lg">{skins.length}</span>
-              <span className="text-cs-muted text-sm font-body ml-2">skins</span>
-            </div>
-          </div>
+    <section id="grid" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Seção header */}
+      <div className="flex items-center gap-3 mb-10">
+        <div className="w-1.5 h-8 rounded-full bg-gradient-to-b from-cs-blue to-cs-gold" />
+        <div>
+          <h2 className="font-display font-black text-3xl text-cs-text uppercase tracking-tighter">
+            {title}
+          </h2>
         </div>
+        <div className="ml-auto px-3 py-1 rounded-full bg-cs-blue/10 border border-cs-blue/30">
+          <span className="text-cs-blue font-bold text-sm">{safeSkins.length}</span>
+        </div>
+      </div>
 
-        {/* Grid responsivo */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 sm:gap-5">
-          {skins.map((skin, i) => (
-            <div
-              key={skin.id}
-              className="animate-fade-in"
-              style={{ animationDelay: `${Math.min(i * 20, 400)}ms`, opacity: 0 }}
-            >
-              <SkinCard 
-                skin={skin} 
-                onDelete={onDelete} 
-                onToggleFavorite={onToggleFavorite}
-                isFavorite={!!favorites.find(f => f.id === skin.id)}
-              />
-            </div>
-          ))}
-        </div>
+      {/* Grid responsivo */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 sm:gap-6">
+        {safeSkins.map((skin, i) => (
+          <div
+            key={skin.id || i}
+            className="animate-fade-in"
+            style={{ animationDelay: `${Math.min(i * 15, 300)}ms`, opacity: 0 }}
+          >
+            <SkinCard skin={skin} />
+          </div>
+        ))}
       </div>
     </section>
   )

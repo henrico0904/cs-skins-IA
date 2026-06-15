@@ -1,8 +1,7 @@
-export default function Header({ onToggleFavorites, currentView, favoriteCount }) {
+export default function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-cs-bg/90 backdrop-blur-xl border-b border-cs-border/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
-
         {/* Logo */}
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cs-blue to-cs-gold flex items-center justify-center flex-shrink-0 shadow-lg shadow-cs-blue/50">
@@ -18,27 +17,16 @@ export default function Header({ onToggleFavorites, currentView, favoriteCount }
 
         {/* Nav */}
         <nav className="hidden sm:flex items-center gap-8 text-sm font-body font-medium text-cs-muted">
-          <button 
-            onClick={() => onToggleFavorites()} 
-            className={`transition-colors duration-200 ${currentView === 'all' ? 'hover:text-cs-blue' : 'text-cs-gold font-bold'}`}
-          >
-            {currentView === 'all' ? 'Explorar' : 'Ver Todas'}
-          </button>
-          <a href="#grid" className="hover:text-cs-blue transition-colors duration-200">Coleção</a>
+          <a href="#" className="hover:text-cs-blue transition-colors duration-200">Catálogo</a>
+          <a href="#" className="hover:text-cs-blue transition-colors duration-200">Explorar</a>
           <a href="#" className="hover:text-cs-blue transition-colors duration-200">Sobre</a>
         </nav>
 
-        {/* CTA */}
-        <button
-          onClick={onToggleFavorites}
-          className={`text-xs font-body font-bold uppercase tracking-wider px-4 py-2 rounded-lg transition-all duration-200 transform hover:scale-105 flex items-center gap-2 ${
-            currentView === 'favorites' 
-            ? 'bg-cs-blue text-white shadow-lg shadow-cs-blue/50' 
-            : 'bg-gradient-to-r from-cs-blue to-cs-gold text-white hover:shadow-lg hover:shadow-cs-blue/50'
-          }`}
-        >
-          {currentView === 'favorites' ? 'Ver Todas' : `⭐ Favoritos (${favoriteCount})`}
-        </button>
+        {/* Badge */}
+        <div className="hidden xs:flex items-center gap-2 px-3 py-1 rounded-full bg-cs-blue/10 border border-cs-blue/20">
+          <span className="w-2 h-2 rounded-full bg-cs-blue animate-pulse" />
+          <span className="text-[10px] font-bold text-cs-blue uppercase tracking-widest">Live Inventory</span>
+        </div>
       </div>
     </header>
   )
