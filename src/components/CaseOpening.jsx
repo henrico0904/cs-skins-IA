@@ -1,127 +1,167 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { getRaridade, formatPrice } from '../lib/utils'
 
 export default function CaseOpening({ skins, spinsLeft, onClose, onUseSpin, onAddFavorite }) {
   const [spinning, setSpinning] = useState(false)
   const [wonSkin, setWonSkin] = useState(null)
-  const [history, setHistory] = useState([])
+  const [rouletteSkins, setRouletteSkins] = useState([])
+  const trackRef = useRef(null)
 
-  const getRandomSkin = () => {
-    const rand = Math.random()
-    let selected
-
-    if (rand < 0.60) {
-      selected = skins.filter(s => getRaridade(s.raridade).label === 'Normal')
-    } else if (rand < 0.90) {
-      selected = skins.filter(s => getRaridade(s.raridade).label === 'Épica')
-    } else {
-      selected = skins.filter(s => getRaridade(s.raridade).label === 'Rara')
+  // Prepara a lista de skins para a roleta
+  const prepareRoulette = () => {
+    const list = []
+    for (let i = 0; i < 50; i++) {
+      const rand = Math.random()
+      let pool
+      if (rand < 0.70) pool = skins.filter(s => getRaridade(s.raridade).label === 'Normal')
+      else if (rand < 0.95) pool = skins.filter(s => getRaridade(s.raridade).label === 'Épica')
+      else pool = skins.filter(s => getRaridade(s.raridade).label === 'Rara')
+      
+      if (pool.length === 0) pool = skins
+      list.push(pool[Math.floor(Math.random() * pool.length)])
     }
-
-    if (selected.length === 0) return skins[Math.floor(Math.random() * skins.length)]
-    return selected[Math.floor(Math.random() * selected.length)]
+    return list
   }
 
   const openCase = () => {
     if (spinsLeft <= 0 || spinning) return
 
+    const newList = prepareRoulette()
+    setRouletteSkins(newList)
+    setWonSkin(null)
     setSpinning(true)
     onUseSpin()
 
+    // A skin vencedora será a de índice 45 (quase no final)
+    const winner = newList[45]
+    
+    // Inicia animação após um pequeno delay para garantir que o track renderizou
     setTimeout(() => {
-      const skin = getRandomSkin()
-      setWonSkin(skin)
-      setHistory(prev => [skin, ...prev].slice(0, 10))
+      if (trackRef.current) {
+        // Cada item tem 100px. Queremos centralizar o item 45 no container de 400px.
+        // O centro do container é 200px. O centro do item 45 é 45 * 100 + 50.
+        // Deslocamento = -(45 * 100 + 50 - 200) = -4350px
+        const offset = -(45 * 100 + 50 - 200)
+        trackRef.current.style.transform = `translateY(${offset}px)`
+      }
+    }, 50)
+
+    setTimeout(() => {
+      setWonSkin(winner)
       setSpinning(false)
-    }, 1500)
+    }, 5200) // 5s da transição + buffer
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-y-auto">
-      <div className="fixed inset-0 bg-cs-bg/90 backdrop-blur-xl" onClick={onClose} />
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-black/95 backdrop-blur-md" onClick={onClose} />
 
-      <div className="relative bg-cs-surface border border-cs-border rounded-3xl w-full max-w-5xl overflow-hidden shadow-2xl my-8">
-        <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 flex justify-between items-center">
-          <h2 className="text-3xl font-black text-white uppercase tracking-tighter">🎰 Roleta Diária</h2>
-          <button onClick={onClose} className="text-white hover:bg-white/20 p-2 rounded-lg">✕</button>
+      <div className="relative bg-cs-surface border border-white/10 w-full max-w-5xl shadow-[0_0_100px_rgba(0,0,0,0.8)] animate-fade-in">
+        {/* Header */}
+        <div className="bg-white/5 border-b border-white/10 p-6 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <svg className="w-6 h-6 text-cs-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Sorteio Diário</h2>
+          </div>
+          <button onClick={onClose} className="text-white hover:bg-white/10 p-2 transition-colors">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" strokeWidth="2" /></svg>
+          </button>
         </div>
 
         <div className="p-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-1">
-              <div className="bg-cs-bg rounded-2xl p-6 space-y-4 border border-cs-border">
-                <div>
-                  <p className="text-cs-muted text-xs uppercase font-bold tracking-widest">Giros Restantes Hoje</p>
-                  <p className={`text-5xl font-black ${spinsLeft > 0 ? 'text-cs-blue' : 'text-red-500'}`}>{spinsLeft}</p>
-                </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Info Panel */}
+            <div className="lg:col-span-4 space-y-6">
+              <div className="bg-black/40 border border-white/5 p-8">
+                <p className="text-cs-muted text-[10px] uppercase font-black tracking-[0.3em] mb-2">Créditos de Abertura</p>
+                <p className={`text-6xl font-black mb-6 ${spinsLeft > 0 ? 'text-white' : 'text-red-600'}`}>
+                  {spinsLeft.toString().padStart(2, '0')}
+                </p>
                 <button
                   onClick={openCase}
                   disabled={spinsLeft <= 0 || spinning}
-                  className={`w-full py-5 font-black text-xl rounded-2xl transition-all transform ${
+                  className={`w-full py-6 font-black text-lg tracking-widest transition-all ${
                     spinsLeft > 0 && !spinning
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:scale-105 shadow-lg shadow-purple-600/20'
-                      : 'bg-cs-border text-cs-muted cursor-not-allowed opacity-50'
+                      ? 'bg-cs-blue text-white hover:bg-cs-blue/80'
+                      : 'bg-white/5 text-cs-muted cursor-not-allowed'
                   }`}
                 >
-                  {spinning ? 'SORTEANDO...' : 'GIRAR ROLETA'}
+                  {spinning ? 'PROCESSANDO...' : 'INICIAR SORTEIO'}
                 </button>
-                <p className="text-[10px] text-cs-muted text-center uppercase font-bold">O limite reseta automaticamente a cada 24h</p>
+                <p className="text-[9px] text-cs-muted mt-4 font-bold uppercase tracking-widest">Limite de 20 acessos a cada 24 horas</p>
               </div>
             </div>
 
-            <div className="lg:col-span-1">
-              <div className="bg-gradient-to-b from-purple-600/5 to-pink-600/5 rounded-3xl p-8 border border-white/5 flex flex-col items-center justify-center min-h-[400px] relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-600/10 via-transparent to-transparent opacity-50" />
+            {/* Roulette View */}
+            <div className="lg:col-span-8">
+              <div className="roulette-container relative border border-white/10 bg-black/60">
+                <div className="roulette-pointer" />
                 
-                {wonSkin ? (
-                  <div className="text-center w-full relative z-10 animate-fade-in">
-                    <div className="mb-6 transform transition-all hover:scale-110 duration-500">
-                      <img
-                        src={`https://wsrv.nl/?url=${encodeURIComponent(wonSkin.imagem_url)}&w=400&output=webp`}
-                        alt={wonSkin.nome}
-                        className="w-full h-52 object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
-                        onError={(e) => { e.target.src = 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I4ipSrpav3tEFlpAXk8QJQwNxRSA2//330x192' }}
-                      />
-                    </div>
-                    <p className="text-xs font-bold text-cs-blue uppercase tracking-[0.2em] mb-1">{wonSkin.arma}</p>
-                    <p className="font-black text-2xl text-white mb-4 leading-tight">{wonSkin.nome}</p>
-                    <button
-                      onClick={() => onAddFavorite(wonSkin)}
-                      className="px-6 py-3 bg-white text-black font-black rounded-xl hover:scale-105 transition-transform flex items-center gap-2 mx-auto"
-                    >
-                      ⭐ SALVAR NA COLEÇÃO
-                    </button>
+                {rouletteSkins.length > 0 ? (
+                  <div 
+                    ref={trackRef} 
+                    className="roulette-track"
+                    style={{ transform: 'translateY(0px)' }}
+                  >
+                    {rouletteSkins.map((skin, i) => {
+                      const cfg = getRaridade(skin.raridade)
+                      return (
+                        <div key={i} className="roulette-item group">
+                          <div className="w-1.5 h-full mr-6" style={{ backgroundColor: cfg.color }} />
+                          <div className="w-16 h-16 flex-shrink-0 mr-6">
+                            <img 
+                              src={`https://wsrv.nl/?url=${encodeURIComponent(skin.imagem_url)}&w=100&output=webp`} 
+                              className="w-full h-full object-contain"
+                              alt=""
+                            />
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-black uppercase tracking-widest opacity-40">{skin.arma}</p>
+                            <p className="text-sm font-black text-white uppercase">{skin.nome}</p>
+                          </div>
+                          <div className="ml-auto">
+                            <span className="text-[10px] font-black px-2 py-1 border border-white/10" style={{ color: cfg.color }}>
+                              {cfg.label}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })}
                   </div>
                 ) : (
-                  <div className="text-center relative z-10">
-                    <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-6 mx-auto border border-white/10">
-                      <p className="text-5xl animate-bounce">🎰</p>
-                    </div>
-                    <p className="text-cs-muted font-black uppercase tracking-widest text-sm">Gire para ganhar uma skin!</p>
+                  <div className="h-full flex flex-col items-center justify-center opacity-20">
+                    <svg className="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                    <p className="font-black uppercase tracking-[0.5em] text-xs">Aguardando Início</p>
                   </div>
                 )}
               </div>
-            </div>
 
-            <div className="lg:col-span-1">
-              <div className="bg-cs-bg rounded-2xl p-6 border border-cs-border h-full">
-                <h3 className="font-black text-white mb-4 uppercase text-xs tracking-widest opacity-50">Últimos Ganhos</h3>
-                <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                  {history.length === 0 ? (
-                    <p className="text-cs-muted text-xs font-bold py-10 text-center">Nenhum giro realizado</p>
-                  ) : (
-                    history.map((skin, i) => {
-                      const cfg = getRaridade(skin.raridade)
-                      return (
-                        <div key={i} className="p-3 rounded-xl text-xs font-black flex items-center justify-between border border-white/5 bg-white/5" style={{ borderLeft: `4px solid ${cfg.color}` }}>
-                          <span className="truncate mr-2">{skin.nome}</span>
-                          <span style={{ color: cfg.color }}>{cfg.label}</span>
-                        </div>
-                      )
-                    })
-                  )}
+              {/* Result Overlay */}
+              {wonSkin && !spinning && (
+                <div className="mt-6 p-8 bg-white/5 border border-white/10 flex items-center gap-8 animate-fade-in">
+                  <div className="w-32 h-32 flex-shrink-0 bg-black/40 p-4 border border-white/5">
+                    <img 
+                      src={`https://wsrv.nl/?url=${encodeURIComponent(wonSkin.imagem_url)}&w=200&output=webp`} 
+                      className="w-full h-full object-contain"
+                      alt=""
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-cs-blue text-[10px] font-black uppercase tracking-[0.3em] mb-1">{wonSkin.arma}</p>
+                    <h3 className="text-2xl font-black text-white uppercase mb-4">{wonSkin.nome}</h3>
+                    <button
+                      onClick={() => onAddFavorite(wonSkin)}
+                      className="px-6 py-3 bg-white text-black font-black text-xs uppercase tracking-widest hover:bg-cs-blue hover:text-white transition-all"
+                    >
+                      Salvar na Coleção
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>

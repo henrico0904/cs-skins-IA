@@ -1,52 +1,62 @@
 export default function GameNav({ spinsLeft, view, onViewChange, onOpenCaseOpening }) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-cs-bg/95 backdrop-blur-xl border-t border-white/5">
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-black/95 backdrop-blur-xl border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between gap-4">
           
-          {/* Giros Diários */}
-          <div className="flex items-center gap-3 px-5 py-2 rounded-2xl bg-white/5 border border-white/10">
-            <span className="text-xl">🎰</span>
-            <div>
-              <p className="text-[9px] text-cs-muted uppercase font-black tracking-widest">Giros Hoje</p>
-              <p className={`text-xl font-black ${spinsLeft > 0 ? 'text-cs-blue' : 'text-red-500'}`}>{spinsLeft}</p>
+          {/* Status Panel */}
+          <div className="flex items-center gap-6 px-6 py-3 bg-white/5 border border-white/10">
+            <div className="flex flex-col">
+              <p className="text-[8px] text-cs-muted uppercase font-black tracking-[0.3em]">Status Sistema</p>
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-green-500 animate-pulse" />
+                <span className="text-[10px] font-black text-white uppercase tracking-widest">Online</span>
+              </div>
+            </div>
+            <div className="w-px h-8 bg-white/10" />
+            <div className="flex flex-col">
+              <p className="text-[8px] text-cs-muted uppercase font-black tracking-[0.3em]">Acessos Diários</p>
+              <p className={`text-xl font-black ${spinsLeft > 0 ? 'text-cs-blue' : 'text-red-600'}`}>
+                {spinsLeft.toString().padStart(2, '0')}
+              </p>
             </div>
           </div>
 
-          {/* Navegação Central */}
-          <div className="flex p-1 bg-white/5 rounded-xl border border-white/10">
+          {/* Nav Controls */}
+          <div className="flex bg-white/5 border border-white/10 p-1">
             <button
               onClick={() => onViewChange('catalog')}
-              className={`px-6 py-2 rounded-lg font-black uppercase text-[10px] tracking-widest transition-all ${
+              className={`px-8 py-3 font-black uppercase text-[10px] tracking-[0.3em] transition-all ${
                 view === 'catalog'
-                  ? 'bg-cs-blue text-white shadow-lg shadow-cs-blue/20'
-                  : 'text-cs-muted hover:text-white'
+                  ? 'bg-cs-blue text-white'
+                  : 'text-cs-muted hover:text-white hover:bg-white/5'
               }`}
             >
               Catálogo
             </button>
             <button
               onClick={() => onViewChange('favorites')}
-              className={`px-6 py-2 rounded-lg font-black uppercase text-[10px] tracking-widest transition-all ${
+              className={`px-8 py-3 font-black uppercase text-[10px] tracking-[0.3em] transition-all ${
                 view === 'favorites'
-                  ? 'bg-cs-gold text-cs-bg shadow-lg shadow-cs-gold/20'
-                  : 'text-cs-muted hover:text-white'
+                  ? 'bg-cs-gold text-cs-bg'
+                  : 'text-cs-muted hover:text-white hover:bg-white/5'
               }`}
             >
-              Favoritas
+              Coleção
             </button>
           </div>
 
-          {/* Botão Roleta */}
+          {/* Action Button */}
           <button
             onClick={onOpenCaseOpening}
-            className={`px-8 py-3 rounded-xl font-black uppercase text-xs tracking-[0.2em] transition-all transform hover:scale-105 active:scale-95 ${
+            disabled={spinsLeft <= 0}
+            className={`px-10 py-4 font-black uppercase text-xs tracking-[0.4em] transition-all transform active:scale-95 ${
               spinsLeft > 0 
-                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-600/20'
-                : 'bg-cs-border text-cs-muted cursor-not-allowed opacity-50'
+                ? 'bg-white text-black hover:bg-cs-blue hover:text-white'
+                : 'bg-white/5 text-cs-muted cursor-not-allowed'
             }`}
           >
-            Abrir Case
+            Abrir Container
           </button>
 
         </div>
