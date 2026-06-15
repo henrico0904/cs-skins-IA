@@ -8,32 +8,36 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
   const [addedToInv, setAddedToInv] = useState(false)
   const trackRef = useRef(null)
 
+  // Probabilidades Oficiais
   const ODDS = [
-    { label: 'Consumível',  chance: 0.40, color: '#b0c3d9' },
-    { label: 'Industrial',  chance: 0.25, color: '#5e98d9' },
-    { label: 'Mil-spec',    chance: 0.15, color: '#4b69ff' },
-    { label: 'Restrita',    chance: 0.10, color: '#8847ff' },
-    { label: 'Classificada', chance: 0.06, color: '#d32ce6' },
-    { label: 'Secreta',     chance: 0.03, color: '#eb4b4b' },
-    { label: 'Rara',        chance: 0.01, color: '#FFD700' },
+    { rarity: 'Consumível',   chance: 0.35, color: '#FFFFFF' },
+    { rarity: 'Industrial',   chance: 0.25, color: '#FFFFFF' },
+    { rarity: 'Mil-spec',     chance: 0.15, color: '#FFFFFF' },
+    { rarity: 'Restrita',     chance: 0.10, color: '#A335EE' },
+    { rarity: 'Classificada', chance: 0.08, color: '#A335EE' },
+    { rarity: 'Secreta',      chance: 0.05, color: '#FFD700' },
+    { rarity: 'Contrabandeada', chance: 0.02, color: '#FFD700' },
   ]
 
   const getRandomSkin = () => {
     const rand = Math.random()
     let cumulative = 0
-    let targetLabel = 'Consumível'
+    let targetRarity = 'Consumível'
+
     for (const odd of ODDS) {
       cumulative += odd.chance
       if (rand <= cumulative) {
-        targetLabel = odd.label
+        targetRarity = odd.rarity
         break
       }
     }
-    const pool = skins.filter(s => {
-      const cfg = getRaridade(s.raridade)
-      return cfg.label === targetLabel || (targetLabel === 'Rara' && (cfg.label === 'Contrabandeada' || cfg.label === 'Rara'))
-    })
-    return pool[Math.floor(Math.random() * pool.length)] || skins[0]
+
+    const pool = skins.filter(s => s.raridade === targetRarity)
+    
+    // Se não houver skins da raridade alvo no pool (o que não deve acontecer com 1300 skins), pega qualquer uma
+    if (pool.length === 0) return skins[Math.floor(Math.random() * skins.length)]
+    
+    return pool[Math.floor(Math.random() * pool.length)]
   }
 
   const openCase = () => {
@@ -43,7 +47,6 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
     }
     if (spinning) return
 
-    // RESET: Volta a roleta para o topo instantaneamente antes de começar
     if (trackRef.current) {
       trackRef.current.style.transition = 'none'
       trackRef.current.style.transform = 'translateY(0px)'
@@ -56,7 +59,6 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
     setWonSkin(null)
     setAddedToInv(false)
     
-    // Pequeno delay para o browser processar o reset da posição
     setTimeout(() => {
       setSpinning(true)
       const winner = newList[45]
@@ -89,7 +91,7 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
         <div className="bg-white/5 border-b border-white/10 p-6 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <div className="w-1 h-6 bg-cs-blue" />
-            <h2 className="text-xl font-black text-white uppercase tracking-tighter">Sistema de Containers</h2>
+            <h2 className="text-xl font-black text-white uppercase tracking-tighter">Container de Elite</h2>
           </div>
           <div className="flex items-center gap-6">
             <div className="text-right">
@@ -104,13 +106,13 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-3 space-y-4">
               <div className="bg-black/40 border border-white/5 p-6">
-                <h3 className="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-6 pb-4 border-b border-white/5">Probabilidades</h3>
+                <h3 className="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-6 pb-4 border-b border-white/5">Chances de Sorteio</h3>
                 <div className="space-y-3">
                   {ODDS.map(odd => (
-                    <div key={odd.label} className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
+                    <div key={odd.rarity} className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2" style={{ backgroundColor: odd.color }} />
-                        <span className="text-cs-muted">{odd.label}</span>
+                        <span className="text-cs-muted">{odd.rarity}</span>
                       </div>
                       <span className="text-white">{(odd.chance * 100).toFixed(0)}%</span>
                     </div>
@@ -154,7 +156,7 @@ export default function CaseOpening({ skins, inventoryCount, inventoryLimit, onC
                   </div>
                 ) : (
                   <div className="h-full flex flex-col items-center justify-center opacity-10">
-                    <p className="font-black uppercase tracking-[1em] text-xs">Aguardando Comando</p>
+                    <p className="font-black uppercase tracking-[1em] text-xs">Inicie o Sorteio</p>
                   </div>
                 )}
               </div>

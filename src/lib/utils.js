@@ -1,12 +1,12 @@
-// ─── Raridade → Cores solicitadas pelo usuário ────────────────────────────────
+// ─── Raridades Oficiais do CS2 com as cores solicitadas pelo usuário ────────────────
 export const RARIDADE_CONFIG = {
-  'Contrabandeada': { label: 'Rara',  color: '#FFD700', glow: 'rgba(255, 215, 0, 0.3)' }, // Dourado
-  'Secreta':        { label: 'Rara',  color: '#FFD700', glow: 'rgba(255, 215, 0, 0.3)' }, // Dourado
-  'Classificada':   { label: 'Épica', color: '#A335EE', glow: 'rgba(163, 53, 238, 0.3)' }, // Roxo
-  'Restrita':       { label: 'Épica', color: '#A335EE', glow: 'rgba(163, 53, 238, 0.3)' }, // Roxo
-  'Mil-spec':       { label: 'Normal', color: '#FFFFFF', glow: 'rgba(255, 255, 255, 0.2)' }, // Branco
-  'Industrial':     { label: 'Normal', color: '#FFFFFF', glow: 'rgba(255, 255, 255, 0.2)' }, // Branco
-  'Consumível':     { label: 'Normal', color: '#FFFFFF', glow: 'rgba(255, 255, 255, 0.2)' }, // Branco
+  'Contrabandeada': { label: 'Contrabandeada', color: '#FFD700', glow: 'rgba(255, 215, 0, 0.3)' }, // Dourado
+  'Secreta':        { label: 'Secreta',        color: '#FFD700', glow: 'rgba(255, 215, 0, 0.3)' }, // Dourado
+  'Classificada':   { label: 'Classificada',   color: '#A335EE', glow: 'rgba(163, 53, 238, 0.3)' }, // Roxo
+  'Restrita':       { label: 'Restrita',       color: '#A335EE', glow: 'rgba(163, 53, 238, 0.3)' }, // Roxo
+  'Mil-spec':       { label: 'Mil-spec',       color: '#FFFFFF', glow: 'rgba(255, 255, 255, 0.2)' }, // Branco
+  'Industrial':     { label: 'Industrial',     color: '#FFFFFF', glow: 'rgba(255, 255, 255, 0.2)' }, // Branco
+  'Consumível':     { label: 'Consumível',     color: '#FFFFFF', glow: 'rgba(255, 255, 255, 0.2)' }, // Branco
 }
 
 export function getRaridade(raridade) {
@@ -21,7 +21,6 @@ export function formatPrice(valor) {
   }).format(valor)
 }
 
-// Tabela de multiplicadores de preço por desgaste (simulação de mercado)
 export const WEAR_LEVELS = [
   { id: 'FN', name: 'Nova de Fábrica', multiplier: 1.5, float: '0.00 - 0.07' },
   { id: 'MW', name: 'Pouco Usada',    multiplier: 1.0, float: '0.07 - 0.15' },
@@ -30,8 +29,6 @@ export const WEAR_LEVELS = [
   { id: 'BS', name: 'Veterana de Guerra', multiplier: 0.3, float: '0.45 - 1.00' },
 ]
 
-// MOCK_SKINS atualizado
 export const MOCK_SKINS = [
   { id: '1', nome: 'Dragon Lore', arma: 'AWP', preco: 18500, raridade: 'Contrabandeada', imagem_url: '' },
-  { id: '2', nome: 'Howl', arma: 'M4A4', preco: 12000, raridade: 'Contrabandeada', imagem_url: '' },
 ]

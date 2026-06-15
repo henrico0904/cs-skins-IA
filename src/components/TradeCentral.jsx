@@ -7,7 +7,7 @@ export default function TradeCentral({ inventory, skins, onClose, onTradeComplet
   const [resultSkin, setResultSkin] = useState(null)
 
   const toggleSelect = (id) => {
-    if (resultSkin) return // Impede seleção se já houver resultado
+    if (resultSkin) return
     if (selectedIds.includes(id)) {
       setSelectedIds(prev => prev.filter(i => i !== id))
     } else if (selectedIds.length < 5) {
@@ -25,14 +25,18 @@ export default function TradeCentral({ inventory, skins, onClose, onTradeComplet
     
     const rarityOrder = ['Consumível', 'Industrial', 'Mil-spec', 'Restrita', 'Classificada', 'Secreta', 'Contrabandeada']
     const currentIndex = rarityOrder.indexOf(firstRarity)
+    
+    // Upgrade de raridade (se for Contrabandeada, permanece Contrabandeada)
     const nextRarity = currentIndex < rarityOrder.length - 1 ? rarityOrder[currentIndex + 1] : rarityOrder[currentIndex]
 
+    // Pega todas as skins da raridade alvo
     const pool = skins.filter(s => s.raridade === nextRarity)
     const won = pool[Math.floor(Math.random() * pool.length)] || skins[0]
 
     setTimeout(() => {
       setResultSkin(won)
-      onTradeComplete(selectedIds, won) // Aqui as skins somem do inventário global
+      // MUITO IMPORTANTE: Chama o callback para remover as skins do estado global
+      onTradeComplete(selectedIds, won)
       setTrading(false)
     }, 2000)
   }
@@ -130,7 +134,7 @@ export default function TradeCentral({ inventory, skins, onClose, onTradeComplet
                         : 'bg-white/5 text-cs-muted cursor-not-allowed'
                     }`}
                   >
-                    {trading ? 'PROCESSANDO...' : 'ASSINAR CONTRATO'}
+                    {trading ? 'ASSINANDO CONTRATO...' : 'ASSINAR CONTRATO'}
                   </button>
                 )}
               </div>
