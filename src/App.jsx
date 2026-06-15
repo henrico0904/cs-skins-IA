@@ -2,6 +2,12 @@ import { useState, useEffect, useMemo } from 'react'
 import Header      from './components/Header'
 import SkinsGrid   from './components/SkinsGrid'
 import SkinModal   from './components/SkinModal'
+import GameNav     from './components/GameNav'
+import FavoritesPage from './components/FavoritesPage'
+import AimTrainer  from './components/AimTrainer'
+import DefuseGame  from './components/DefuseGame'
+import CaseOpening from './components/CaseOpening'
+import { useGameState } from './hooks/useGameState'
 import { MOCK_SKINS } from './lib/utils'
 import convertedSkins from './lib/skins_converted.json'
 
@@ -10,6 +16,12 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [skins, setSkins] = useState([])
   const [selectedSkin, setSelectedSkin] = useState(null)
+  const [view, setView] = useState('catalog')
+  const [showAimTrainer, setShowAimTrainer] = useState(false)
+  const [showDefuseGame, setShowDefuseGame] = useState(false)
+  const [showCaseOpening, setShowCaseOpening] = useState(false)
+
+  const { coins, favorites, addCoins, removeCoins, toggleFavorite, isFavorite } = useGameState()
 
   useEffect(() => {
     try {
@@ -37,16 +49,15 @@ export default function App() {
   }, [skins, searchTerm])
 
   return (
-    <div className="min-h-screen bg-cs-bg text-cs-text font-body">
+    <div className="min-h-screen bg-cs-bg text-cs-text font-body pb-32">
       <Header />
 
       <div className="h-14" />
 
-      {/* Hero banner - Título Holográfico Monumental */}
+      {/* Hero banner */}
       <div className="relative py-28 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-cs-blue/10 via-cs-bg to-cs-bg" />
         
-        {/* Decorative elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-24 -left-24 w-[500px] h-[500px] bg-cs-blue/20 rounded-full blur-[120px] animate-pulse" />
           <div className="absolute top-1/2 -right-24 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[100px] animate-pulse animation-delay-2000" />
@@ -88,11 +99,17 @@ export default function App() {
         </div>
       </div>
 
-      <main className="pb-32">
+      <main className="pb-20">
         {loading ? (
           <div className="max-w-7xl mx-auto px-4 py-20 text-center">
              <div className="w-16 h-16 border-4 border-cs-blue/20 border-t-cs-blue rounded-full animate-spin mx-auto" />
           </div>
+        ) : view === 'favorites' ? (
+          <FavoritesPage 
+            favorites={favorites} 
+            onSelectSkin={setSelectedSkin}
+            onRemoveFavorite={toggleFavorite}
+          />
         ) : (
           <SkinsGrid 
             skins={filteredSkins} 
@@ -109,9 +126,44 @@ export default function App() {
         />
       )}
 
+      {/* Mini-Games */}
+      {showAimTrainer && (
+        <AimTrainer 
+          onClose={() => setShowAimTrainer(false)} 
+          onEarnCoins={addCoins}
+        />
+      )}
+
+      {showDefuseGame && (
+        <DefuseGame 
+          onClose={() => setShowDefuseGame(false)} 
+          onEarnCoins={addCoins}
+        />
+      )}
+
+      {showCaseOpening && (
+        <CaseOpening 
+          skins={skins}
+          coins={coins}
+          onClose={() => setShowCaseOpening(false)}
+          onRemoveCoins={removeCoins}
+          onAddFavorite={toggleFavorite}
+        />
+      )}
+
+      {/* Game Navigation Bar */}
+      <GameNav 
+        coins={coins}
+        view={view}
+        onViewChange={setView}
+        onOpenAimTrainer={() => setShowAimTrainer(true)}
+        onOpenDefuseGame={() => setShowDefuseGame(true)}
+        onOpenCaseOpening={() => setShowCaseOpening(true)}
+      />
+
       <footer className="border-t border-white/5 py-16 text-center text-cs-muted text-[10px] font-bold uppercase tracking-[0.3em]">
         <div className="max-w-7xl mx-auto px-4">
-          <p className="mb-4 text-white opacity-40">CS:GO Skins IA © 2026</p>
+          <p className="mb-2 text-sm font-bold text-cs-text uppercase tracking-widest">CS:GO Skins IA © 2026</p>
           <div className="flex justify-center gap-8 opacity-30">
             <span>Steam API</span>
             <span>Vercel Hosting</span>
