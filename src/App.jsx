@@ -4,8 +4,6 @@ import SkinsGrid   from './components/SkinsGrid'
 import SkinModal   from './components/SkinModal'
 import GameNav     from './components/GameNav'
 import FavoritesPage from './components/FavoritesPage'
-import AimTrainer  from './components/AimTrainer'
-import DefuseGame  from './components/DefuseGame'
 import CaseOpening from './components/CaseOpening'
 import { useGameState } from './hooks/useGameState'
 import { MOCK_SKINS } from './lib/utils'
@@ -17,11 +15,9 @@ export default function App() {
   const [skins, setSkins] = useState([])
   const [selectedSkin, setSelectedSkin] = useState(null)
   const [view, setView] = useState('catalog')
-  const [showAimTrainer, setShowAimTrainer] = useState(false)
-  const [showDefuseGame, setShowDefuseGame] = useState(false)
   const [showCaseOpening, setShowCaseOpening] = useState(false)
 
-  const { coins, favorites, addCoins, removeCoins, toggleFavorite, isFavorite } = useGameState()
+  const { favorites, spinsLeft, toggleFavorite, useSpin } = useGameState()
 
   useEffect(() => {
     try {
@@ -126,38 +122,21 @@ export default function App() {
         />
       )}
 
-      {/* Mini-Games */}
-      {showAimTrainer && (
-        <AimTrainer 
-          onClose={() => setShowAimTrainer(false)} 
-          onEarnCoins={addCoins}
-        />
-      )}
-
-      {showDefuseGame && (
-        <DefuseGame 
-          onClose={() => setShowDefuseGame(false)} 
-          onEarnCoins={addCoins}
-        />
-      )}
-
       {showCaseOpening && (
         <CaseOpening 
           skins={skins}
-          coins={coins}
+          spinsLeft={spinsLeft}
           onClose={() => setShowCaseOpening(false)}
-          onRemoveCoins={removeCoins}
+          onUseSpin={useSpin}
           onAddFavorite={toggleFavorite}
         />
       )}
 
-      {/* Game Navigation Bar */}
+      {/* Simplified Navigation Bar */}
       <GameNav 
-        coins={coins}
+        spinsLeft={spinsLeft}
         view={view}
         onViewChange={setView}
-        onOpenAimTrainer={() => setShowAimTrainer(true)}
-        onOpenDefuseGame={() => setShowDefuseGame(true)}
         onOpenCaseOpening={() => setShowCaseOpening(true)}
       />
 

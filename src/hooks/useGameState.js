@@ -1,37 +1,31 @@
 import { useState, useEffect } from 'react'
 
 export function useGameState() {
-  const [coins, setCoins] = useState(0)
   const [favorites, setFavorites] = useState([])
-  const [totalCoinsEarned, setTotalCoinsEarned] = useState(0)
+  const [spinsLeft, setSpinsLeft] = useState(20)
+  const [lastSpinDate, setLastSpinDate] = useState('')
 
-  // Carregar do localStorage ao montar
   useEffect(() => {
-    const savedCoins = localStorage.getItem('cs_coins')
     const savedFavorites = localStorage.getItem('cs_favorites')
-    const savedTotal = localStorage.getItem('cs_total_coins_earned')
+    const savedSpins = localStorage.getItem('cs_spins_left')
+    const savedDate = localStorage.getItem('cs_last_spin_date')
+    
+    const today = new Date().toLocaleDateString()
 
-    if (savedCoins) setCoins(parseInt(savedCoins))
     if (savedFavorites) setFavorites(JSON.parse(savedFavorites))
-    if (savedTotal) setTotalCoinsEarned(parseInt(savedTotal))
+    
+    // Lógica de reset diário
+    if (savedDate !== today) {
+      setSpinsLeft(20)
+      setLastSpinDate(today)
+      localStorage.setItem('cs_spins_left', '20')
+      localStorage.setItem('cs_last_spin_date', today)
+    } else if (savedSpins) {
+      setSpinsLeft(parseInt(savedSpins))
+      setLastSpinDate(savedDate)
+    }
   }, [])
 
-  // Salvar moedas no localStorage
-  const addCoins = (amount) => {
-    const newCoins = coins + amount
-    setCoins(newCoins)
-    setTotalCoinsEarned(totalCoinsEarned + amount)
-    localStorage.setItem('cs_coins', newCoins.toString())
-    localStorage.setItem('cs_total_coins_earned', (totalCoinsEarned + amount).toString())
-  }
-
-  const removeCoins = (amount) => {
-    const newCoins = Math.max(0, coins - amount)
-    setCoins(newCoins)
-    localStorage.setItem('cs_coins', newCoins.toString())
-  }
-
-  // Gerenciar favoritos
   const toggleFavorite = (skin) => {
     const isFav = favorites.find(f => f.id === skin.id)
     let newFavs
@@ -44,17 +38,20 @@ export function useGameState() {
     localStorage.setItem('cs_favorites', JSON.stringify(newFavs))
   }
 
-  const isFavorite = (skinId) => {
-    return favorites.some(f => f.id === skinId)
+  const useSpin = () => {
+    if (spinsLeft > 0) {
+      const newSpins = spinsLeft - 1
+      setSpinsLeft(newSpins)
+      localStorage.setItem('cs_spins_left', newSpins.toString())
+      return true
+    }
+    return false
   }
 
   return {
-    coins,
     favorites,
-    totalCoinsEarned,
-    addCoins,
-    removeCoins,
+    spinsLeft,
     toggleFavorite,
-    isFavorite,
+    useSpin,
   }
 }
