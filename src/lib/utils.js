@@ -29,3 +29,9 @@ export const WEAR_LEVELS = [
   { id: 'WW', name: 'Bem Desgastada',  multiplier: 0.5, float: '0.37 - 0.45' },
   { id: 'BS', name: 'Veterana de Guerra', multiplier: 0.3, float: '0.45 - 1.00' },
 ]
+
+// MOCK_SKINS atualizado
+export const MOCK_SKINS = [
+  { id: '1', nome: 'Dragon Lore', arma: 'AWP', preco: 18500, raridade: 'Contrabandeada', imagem_url: '' },
+  { id: '2', nome: 'Howl', arma: 'M4A4', preco: 12000, raridade: 'Contrabandeada', imagem_url: '' },
+]
