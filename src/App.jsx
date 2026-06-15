@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import Header      from './components/Header'
 import SkinsGrid   from './components/SkinsGrid'
+import SkinModal   from './components/SkinModal'
 import { MOCK_SKINS } from './lib/utils'
 import convertedSkins from './lib/skins_converted.json'
 
@@ -8,9 +9,9 @@ export default function App() {
   const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(true)
   const [skins, setSkins] = useState([])
+  const [selectedSkin, setSelectedSkin] = useState(null)
 
   useEffect(() => {
-    // Carregamento ultra-seguro
     try {
       if (Array.isArray(convertedSkins) && convertedSkins.length > 0) {
         setSkins(convertedSkins)
@@ -24,7 +25,6 @@ export default function App() {
     }
   }, [])
 
-  // Filtro de pesquisa performático
   const filteredSkins = useMemo(() => {
     if (!Array.isArray(skins)) return []
     if (!searchTerm) return skins
@@ -40,10 +40,9 @@ export default function App() {
     <div className="min-h-screen bg-cs-bg text-cs-text font-body">
       <Header />
 
-      {/* Spacer for fixed header */}
       <div className="h-14" />
 
-      {/* Hero banner moderno com Busca */}
+      {/* Hero banner */}
       <div className="relative py-20 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-cs-blue/10 via-cs-bg to-cs-bg" />
         <div className="absolute inset-0 opacity-20">
@@ -66,10 +65,9 @@ export default function App() {
             </span>
           </h1>
 
-          {/* Barra de Busca Gigante */}
           <div className="max-w-2xl mx-auto relative group">
             <div className="absolute inset-0 bg-cs-blue/20 blur-xl group-hover:bg-cs-blue/30 transition-all duration-500 rounded-2xl" />
-            <div className="relative flex items-center bg-cs-surface border border-cs-border rounded-2xl p-2 focus-within:border-cs-blue transition-all duration-300">
+            <div className="relative flex items-center bg-cs-surface border border-cs-border rounded-2xl p-2 focus-within:border-cs-blue transition-all duration-300 shadow-2xl">
               <div className="pl-4 pr-2 text-cs-muted">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -99,7 +97,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* Main Content */}
       <main className="pb-20">
         {loading ? (
           <div className="max-w-7xl mx-auto px-4 py-20 text-center">
@@ -112,9 +109,18 @@ export default function App() {
           <SkinsGrid 
             skins={filteredSkins} 
             title={searchTerm ? 'Resultado da Busca' : 'Todas as Skins'} 
+            onSelectSkin={setSelectedSkin}
           />
         )}
       </main>
+
+      {/* Modal de Detalhes */}
+      {selectedSkin && (
+        <SkinModal 
+          skin={selectedSkin} 
+          onClose={() => setSelectedSkin(null)} 
+        />
+      )}
 
       <footer className="border-t border-cs-border py-12 text-center text-cs-muted text-xs font-body">
         <div className="max-w-7xl mx-auto px-4">

@@ -1,16 +1,15 @@
-// ─── Raridade → cores oficiais do CS2 ─────────────────────────────────────────
+// ─── Raridade → Cores solicitadas pelo usuário ────────────────────────────────
 export const RARIDADE_CONFIG = {
-  'Contrabandeada': { label: 'Contrabandeada', color: '#e4ae39', glow: 'rgba(228, 174, 57, 0.3)' }, // Gold
-  'Secreta':        { label: 'Secreta',        color: '#eb4b4b', glow: 'rgba(235, 75, 75, 0.3)' },  // Red
-  'Classificada':   { label: 'Classificada',   color: '#d32ce6', glow: 'rgba(211, 44, 230, 0.25)' }, // Pink/Purple
-  'Restrita':       { label: 'Restrita',       color: '#8847ff', glow: 'rgba(136, 71, 255, 0.2)' },  // Purple/Blue
-  'Mil-spec':       { label: 'Mil-spec',       color: '#4b69ff', glow: 'rgba(75, 105, 255, 0.15)' }, // Blue
-  'Industrial':     { label: 'Industrial',     color: '#5e98d9', glow: 'rgba(94, 152, 217, 0.1)' },  // Light Blue
-  'Consumível':     { label: 'Consumível',     color: '#b0c3d9', glow: 'rgba(176, 195, 217, 0.1)' }, // Grey
+  'Contrabandeada': { label: 'Rara',  color: '#FFD700', glow: 'rgba(255, 215, 0, 0.3)' }, // Dourado
+  'Secreta':        { label: 'Rara',  color: '#FFD700', glow: 'rgba(255, 215, 0, 0.3)' }, // Dourado
+  'Classificada':   { label: 'Épica', color: '#A335EE', glow: 'rgba(163, 53, 238, 0.3)' }, // Roxo
+  'Restrita':       { label: 'Épica', color: '#A335EE', glow: 'rgba(163, 53, 238, 0.3)' }, // Roxo
+  'Mil-spec':       { label: 'Normal', color: '#FFFFFF', glow: 'rgba(255, 255, 255, 0.2)' }, // Branco
+  'Industrial':     { label: 'Normal', color: '#FFFFFF', glow: 'rgba(255, 255, 255, 0.2)' }, // Branco
+  'Consumível':     { label: 'Normal', color: '#FFFFFF', glow: 'rgba(255, 255, 255, 0.2)' }, // Branco
 }
 
 export function getRaridade(raridade) {
-  // Tenta encontrar a raridade ou retorna Consumível como padrão
   return RARIDADE_CONFIG[raridade] || RARIDADE_CONFIG['Consumível']
 }
 
@@ -22,8 +21,11 @@ export function formatPrice(valor) {
   }).format(valor)
 }
 
-// MOCK_SKINS atualizado com raridades corretas para teste
-export const MOCK_SKINS = [
-  { id: '1', nome: 'Dragon Lore', arma: 'AWP', preco: 18500, raridade: 'Contrabandeada', imagem_url: '' },
-  { id: '2', nome: 'Howl', arma: 'M4A4', preco: 12000, raridade: 'Contrabandeada', imagem_url: '' },
+// Tabela de multiplicadores de preço por desgaste (simulação de mercado)
+export const WEAR_LEVELS = [
+  { id: 'FN', name: 'Nova de Fábrica', multiplier: 1.5, float: '0.00 - 0.07' },
+  { id: 'MW', name: 'Pouco Usada',    multiplier: 1.0, float: '0.07 - 0.15' },
+  { id: 'FT', name: 'Testada em Campo', multiplier: 0.7, float: '0.15 - 0.37' },
+  { id: 'WW', name: 'Bem Desgastada',  multiplier: 0.5, float: '0.37 - 0.45' },
+  { id: 'BS', name: 'Veterana de Guerra', multiplier: 0.3, float: '0.45 - 1.00' },
 ]

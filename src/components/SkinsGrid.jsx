@@ -1,7 +1,6 @@
 import SkinCard from './SkinCard'
 
-export default function SkinsGrid({ skins = [], title = 'Skins' }) {
-  // Verificação de segurança para evitar erros de undefined
+export default function SkinsGrid({ skins = [], title = 'Skins', onSelectSkin }) {
   const safeSkins = Array.isArray(skins) ? skins : []
 
   if (safeSkins.length === 0) {
@@ -16,7 +15,6 @@ export default function SkinsGrid({ skins = [], title = 'Skins' }) {
 
   return (
     <section id="grid" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Seção header */}
       <div className="flex items-center gap-3 mb-10">
         <div className="w-1.5 h-8 rounded-full bg-gradient-to-b from-cs-blue to-cs-gold" />
         <div>
@@ -29,13 +27,13 @@ export default function SkinsGrid({ skins = [], title = 'Skins' }) {
         </div>
       </div>
 
-      {/* Grid responsivo */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 sm:gap-6">
         {safeSkins.map((skin, i) => (
           <div
             key={skin.id || i}
-            className="animate-fade-in"
-            style={{ animationDelay: `${Math.min(i * 15, 300)}ms`, opacity: 0 }}
+            className="animate-fade-in cursor-pointer"
+            style={{ animationDelay: `${Math.min(i * 10, 200)}ms`, opacity: 0 }}
+            onClick={() => onSelectSkin && onSelectSkin(skin)}
           >
             <SkinCard skin={skin} />
           </div>

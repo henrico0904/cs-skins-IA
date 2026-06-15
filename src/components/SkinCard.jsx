@@ -12,35 +12,26 @@ export default function SkinCard({ skin }) {
 
   return (
     <article
-      className="relative group rounded-xl overflow-hidden bg-cs-surface border transition-all duration-300 hover:scale-[1.05] hover:shadow-2xl"
+      className="relative group rounded-2xl overflow-hidden bg-cs-surface border transition-all duration-500 hover:scale-[1.08] hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]"
       style={{ 
-        borderColor: `${cfg.color}33`,
-        boxShadow: `inset 0 0 20px ${cfg.glow}`
-      }}
-      onMouseEnter={e => { 
-        e.currentTarget.style.borderColor = cfg.color;
-        e.currentTarget.style.boxShadow = `0 0 30px ${cfg.glow}, inset 0 0 20px ${cfg.glow}`;
-      }}
-      onMouseLeave={e => { 
-        e.currentTarget.style.borderColor = `${cfg.color}33`;
-        e.currentTarget.style.boxShadow = `inset 0 0 20px ${cfg.glow}`;
+        borderColor: `${cfg.color}22`,
       }}
     >
-      {/* Rarity Indicator - Barra lateral ou superior */}
-      <div className="absolute top-0 left-0 right-0 h-1.5" style={{ backgroundColor: cfg.color }} />
+      {/* Rarity Top Bar */}
+      <div className="absolute top-0 left-0 right-0 h-1 z-20" style={{ backgroundColor: cfg.color }} />
 
-      {/* Image area com brilho de fundo da cor da raridade */}
-      <div className="relative flex items-center justify-center h-40 sm:h-48 p-4 overflow-hidden">
-        {/* Glow effect behind image */}
+      {/* Image Area */}
+      <div className="relative flex items-center justify-center h-40 sm:h-48 p-4 overflow-hidden bg-gradient-to-b from-white/5 to-transparent">
+        {/* Ambient Glow */}
         <div 
-          className="absolute inset-0 opacity-20 blur-3xl rounded-full scale-75"
+          className="absolute inset-0 opacity-10 blur-2xl rounded-full scale-75 group-hover:opacity-20 transition-opacity duration-500"
           style={{ backgroundColor: cfg.color }}
         />
         
         <img
           src={proxiedImage}
           alt={`${arma} | ${nome}`}
-          className="relative z-10 h-full w-full object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-125"
+          className="relative z-10 h-full w-full object-contain drop-shadow-2xl transition-transform duration-700 group-hover:scale-125 group-hover:rotate-3"
           loading="lazy"
           referrerPolicy="no-referrer"
           onError={(e) => {
@@ -49,35 +40,38 @@ export default function SkinCard({ skin }) {
           }}
         />
 
-        {/* Raridade badge flutuante */}
-        <span
-          className="absolute top-3 right-3 text-[8px] font-black uppercase tracking-tighter px-2 py-0.5 rounded shadow-sm z-20"
-          style={{ 
-            backgroundColor: cfg.color, 
-            color: '#fff',
-            textShadow: '0 1px 2px rgba(0,0,0,0.3)'
-          }}
-        >
-          {cfg.label}
-        </span>
-      </div>
-
-      {/* Info */}
-      <div className="p-4 bg-gradient-to-t from-cs-bg/80 to-transparent relative z-10">
-        <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: cfg.color }}>{arma}</p>
-        <h3 className="font-display font-bold text-cs-text leading-tight line-clamp-2 min-h-[2.5rem] text-sm sm:text-base group-hover:text-white transition-colors">
-          {nome}
-        </h3>
-        <div className="flex items-center justify-between mt-3 pt-2 border-t border-white/5">
-          <span className="font-display font-black text-cs-blue text-base">
-            {formatPrice(preco || 150)}
+        {/* Floating Label */}
+        <div className="absolute bottom-2 left-2 z-20 flex gap-1">
+          <span
+            className="text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded shadow-lg backdrop-blur-md border border-white/10"
+            style={{ 
+              backgroundColor: cfg.color, 
+              color: cfg.color === '#FFFFFF' ? '#000' : '#fff',
+            }}
+          >
+            {cfg.label}
           </span>
-          <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: cfg.color }} />
         </div>
       </div>
 
-      {/* Hover overlay shine */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+      {/* Info Section */}
+      <div className="p-4 bg-cs-surface relative z-10">
+        <p className="text-[9px] font-bold uppercase tracking-[0.2em] mb-1 opacity-50">{arma}</p>
+        <h3 className="font-display font-bold text-cs-text leading-tight line-clamp-2 min-h-[2.5rem] text-sm sm:text-base group-hover:text-white transition-colors">
+          {nome}
+        </h3>
+        <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
+          <span className="font-display font-black text-cs-blue text-base">
+            {formatPrice(preco || 150)}
+          </span>
+          <div className="flex gap-1">
+             <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: cfg.color }} />
+          </div>
+        </div>
+      </div>
+
+      {/* Interaction Layer */}
+      <div className="absolute inset-0 bg-cs-blue/0 group-hover:bg-cs-blue/5 transition-colors duration-500 pointer-events-none" />
     </article>
   )
 }
