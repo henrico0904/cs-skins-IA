@@ -6,8 +6,11 @@ export default function SkinCard({ skin }) {
   const { nome, arma, preco, raridade, imagem_url } = skin
   const cfg = getRaridade(raridade)
 
-  // URL de fallback garantida
-  const displayImage = imagem_url || 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I4ipSrpav3tEFlpAXk8QJQwNxRSA2//500x500'
+  // Usando um proxy de imagem (wsrv.nl) para garantir que as fotos do Steam carreguem sem bloqueios de Referer/CORS
+  // Isso é uma técnica de "alto nível" para garantir disponibilidade de assets externos.
+  const proxiedImage = imagem_url 
+    ? `https://wsrv.nl/?url=${encodeURIComponent(imagem_url)}&w=400&output=webp`
+    : 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I4ipSrpav3tEFlpAXk8QJQwNxRSA2//500x500'
 
   return (
     <article
@@ -18,16 +21,16 @@ export default function SkinCard({ skin }) {
       <div className="absolute top-0 left-0 right-0 h-1" style={{ backgroundColor: cfg.color }} />
 
       {/* Image area */}
-      <div className="relative bg-gradient-to-b from-cs-blue/5 to-transparent flex items-center justify-center h-40 sm:h-48 p-4">
+      <div className="relative bg-gradient-to-b from-cs-blue/5 to-transparent flex items-center justify-center h-40 sm:h-48 p-4 overflow-hidden">
         <img
-          src={displayImage}
+          src={proxiedImage}
           alt={`${arma} | ${nome}`}
-          className="h-full w-full object-contain drop-shadow-xl transition-transform duration-500 group-hover:scale-125"
+          className="h-full w-full object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-125"
           loading="lazy"
-          referrerPolicy="no-referrer"
           onError={(e) => {
+            // Fallback caso o proxy falhe
             e.target.onerror = null
-            e.target.src = 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I4ipSrpav3tEFlpAXk8QJQwNxRSA2//330x192'
+            e.target.src = imagem_url || 'https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I4ipSrpav3tEFlpAXk8QJQwNxRSA2//330x192'
           }}
         />
 
@@ -45,14 +48,14 @@ export default function SkinCard({ skin }) {
       </div>
 
       {/* Info */}
-      <div className="p-4">
+      <div className="p-4 bg-gradient-to-t from-cs-bg to-transparent">
         <p className="text-cs-muted text-[10px] font-bold uppercase tracking-widest mb-1">{arma}</p>
         <h3 className="font-display font-bold text-cs-text leading-tight line-clamp-2 min-h-[2.5rem] text-sm sm:text-base">
           {nome}
         </h3>
         <div className="flex items-center justify-between mt-3">
           <span className="font-display font-black text-cs-blue text-base">
-            {formatPrice(preco || 100)}
+            {formatPrice(preco || 150)}
           </span>
         </div>
       </div>
