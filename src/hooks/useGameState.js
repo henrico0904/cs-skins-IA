@@ -2,28 +2,11 @@ import { useState, useEffect } from 'react'
 
 export function useGameState() {
   const [favorites, setFavorites] = useState([])
-  const [spinsLeft, setSpinsLeft] = useState(20)
-  const [lastSpinDate, setLastSpinDate] = useState('')
+  const INVENTORY_LIMIT = 30
 
   useEffect(() => {
     const savedFavorites = localStorage.getItem('cs_favorites')
-    const savedSpins = localStorage.getItem('cs_spins_left')
-    const savedDate = localStorage.getItem('cs_last_spin_date')
-    
-    const today = new Date().toLocaleDateString()
-
     if (savedFavorites) setFavorites(JSON.parse(savedFavorites))
-    
-    // Lógica de reset diário
-    if (savedDate !== today) {
-      setSpinsLeft(20)
-      setLastSpinDate(today)
-      localStorage.setItem('cs_spins_left', '20')
-      localStorage.setItem('cs_last_spin_date', today)
-    } else if (savedSpins) {
-      setSpinsLeft(parseInt(savedSpins))
-      setLastSpinDate(savedDate)
-    }
   }, [])
 
   const toggleFavorite = (skin) => {
@@ -32,26 +15,36 @@ export function useGameState() {
     if (isFav) {
       newFavs = favorites.filter(f => f.id !== skin.id)
     } else {
+      if (favorites.length >= INVENTORY_LIMIT) {
+        alert(`Inventário cheio! Limite de ${INVENTORY_LIMIT} itens atingido.`)
+        return false
+      }
       newFavs = [...favorites, skin]
     }
     setFavorites(newFavs)
     localStorage.setItem('cs_favorites', JSON.stringify(newFavs))
+    return true
   }
 
-  const useSpin = () => {
-    if (spinsLeft > 0) {
-      const newSpins = spinsLeft - 1
-      setSpinsLeft(newSpins)
-      localStorage.setItem('cs_spins_left', newSpins.toString())
-      return true
-    }
-    return false
+  const removeSkin = (skinId) => {
+    const newFavs = favorites.filter(f => f.id !== skinId)
+    setFavorites(newFavs)
+    localStorage.setItem('cs_favorites', JSON.stringify(newFavs))
+  }
+
+  const addSkins = (newSkins) => {
+    const availableSpace = INVENTORY_LIMIT - favorites.length
+    const skinsToAdd = newSkins.slice(0, availableSpace)
+    const updatedFavs = [...favorites, ...skinsToAdd]
+    setFavorites(updatedFavs)
+    localStorage.setItem('cs_favorites', JSON.stringify(updatedFavs))
   }
 
   return {
     favorites,
-    spinsLeft,
+    inventoryLimit: INVENTORY_LIMIT,
     toggleFavorite,
-    useSpin,
+    removeSkin,
+    addSkins
   }
 }
